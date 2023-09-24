@@ -1,3 +1,13 @@
+datalogger.onLogFull(function () {
+    log_indicator = false
+    basic.showLeds(`
+        # # # # #
+        # # # # #
+        # # # # #
+        # # # # #
+        # # # # #
+        `)
+})
 radio.onReceivedValue(function (name, value) {
     let log_control = 0
     if (name == log_control) {
@@ -6,7 +16,7 @@ radio.onReceivedValue(function (name, value) {
             basic.showIcon(IconNames.Yes)
         } else {
             log_indicator = false
-            basic.showIcon(IconNames.Yes)
+            basic.showIcon(IconNames.No)
         }
     }
     if (name == angle_signal) {
@@ -20,16 +30,19 @@ timeanddate.set24HourTime(0, 0, 0)
 radio.setGroup(100)
 log_indicator = false
 let display = grove.createDisplay(DigitalPin.P1, DigitalPin.P15)
-datalogger.setColumnTitles("Angle Value")
+datalogger.setColumnTitles("Angle Value - Steering")
 basic.showIcon(IconNames.No)
 basic.forever(function () {
-    display.show(pins.map(
-    pins.analogReadPin(AnalogPin.P0),
-    0,
-    1023,
-    0,
-    180
-    ))
+    if (log_indicator) {
+        datalogger.log(datalogger.createCV("Angle Value - Steering", pins.map(
+        pins.analogReadPin(AnalogPin.P0),
+        0,
+        1023,
+        0,
+        180
+        )))
+        led.toggle(4, 4)
+    }
     radio.sendValue(angle_signal, pins.map(
     pins.analogReadPin(AnalogPin.P0),
     0,
@@ -37,14 +50,11 @@ basic.forever(function () {
     0,
     180
     ))
-    if (log_indicator) {
-        led.toggle(4, 4)
-        datalogger.log(datalogger.createCV("Angle Value", pins.map(
-        pins.analogReadPin(AnalogPin.P0),
-        0,
-        1023,
-        0,
-        180
-        )))
-    }
+    display.show(pins.map(
+    pins.analogReadPin(AnalogPin.P0),
+    0,
+    1023,
+    0,
+    180
+    ))
 })
