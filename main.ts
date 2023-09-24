@@ -15,6 +15,8 @@ radio.onReceivedValue(function (name, value) {
 })
 let angle_signal = ""
 let log_indicator = false
+datalogger.includeTimestamp(FlashLogTimeStampFormat.Milliseconds)
+timeanddate.set24HourTime(0, 0, 0)
 radio.setGroup(100)
 log_indicator = false
 let display = grove.createDisplay(DigitalPin.P1, DigitalPin.P15)
